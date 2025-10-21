@@ -12,6 +12,7 @@
 
 // ==/UserScript==
 let listaHD = JSON.parse(GM_getValue('listaHD', '[]'));
+let a = 5;
 (function () {
     'use strict';
 
