@@ -5,6 +5,8 @@
 // @description  Crea un overlay estilo FilmAffinity para la lista HD
 // @author       Marc
 // @match        https://www.filmaffinity.com/*
+// @updateURL    https://raw.githubusercontent.com/MarcRoviraP/tampermonkey_scripts/main/filmaffinity.js
+// @downloadURL  https://raw.githubusercontent.com/MarcRoviraP/tampermonkey_scripts/main/filmaffinity.js
 // @grant        GM_setValue
 // @grant        GM_getValue
 
