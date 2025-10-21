@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Lista HD en FilmAffinity
 // @namespace    http://tampermonkey.net/
-// @version      1.1.2
+// @version      1.1.3
 // @description  Crea un overlay estilo FilmAffinity para la lista HD
 // @author       Marc
 // @match        https://www.filmaffinity.com/*
@@ -12,7 +12,6 @@
 
 // ==/UserScript==
 let listaHD = JSON.parse(GM_getValue('listaHD', '[]'));
-let a = 5;
 (function () {
     'use strict';
 
