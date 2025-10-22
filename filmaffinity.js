@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Lista HD en FilmAffinity
 // @namespace    http://tampermonkey.net/
-// @version      1.1.3
+// @version      1.1.7
 // @description  Crea un overlay estilo FilmAffinity para la lista HD
 // @author       Marc
 // @match        https://www.filmaffinity.com/*
@@ -9,33 +9,51 @@
 // @downloadURL  https://raw.githubusercontent.com/MarcRoviraP/tampermonkey_scripts/main/filmaffinity.js
 // @grant        GM_setValue
 // @grant        GM_getValue
-
 // ==/UserScript==
+
 let listaHD = JSON.parse(GM_getValue('listaHD', '[]'));
+var color1 = "#447CAD";
+var color2 = "#F9C700";
+
 (function () {
     'use strict';
 
-    // Recuperar lista HD
+    document.addEventListener("keydown", function (e) {
+    if (e.altKey && e.key.toLowerCase() === "o") {
+        e.preventDefault(); // Evita acciones por defecto (por ejemplo, menú del navegador)
+        mostrarOverlayHD(); // Aquí llamas tu función
+    }
+});
 
-    // Eliminar botón existente
+    const style = document.createElement('style');
+    style.textContent = `
+    @keyframes blink {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0; }
+    }
+
+    .blink {
+        animation: blink 0.8s infinite;
+    }
+`;
+    document.head.appendChild(style);
+
     const delDiv = document.querySelector('.add-movie-list-info.add-to-list-button');
     if (delDiv) delDiv.remove();
 
     const targetDiv = document.querySelector('.add-text-content');
     if (targetDiv) {
-        // Crear enlace
         const newChild = document.createElement('a');
         newChild.textContent = ' Lista HD en espera';
-        newChild.style.color = '#447CAD';
+        newChild.style.color = '${color1}';
         newChild.style.fontWeight = 'bold';
         newChild.style.cursor = 'pointer';
         targetDiv.appendChild(newChild);
 
-        // Crear botón HD
         const hdButton = document.createElement('button');
         hdButton.textContent = 'HD';
         hdButton.style.cssText = `
-            background: #447CAD;
+            background: ${color1};
             color: white;
             border: none;
             border-radius: 50%;
@@ -50,110 +68,156 @@ let listaHD = JSON.parse(GM_getValue('listaHD', '[]'));
         `;
         targetDiv.appendChild(hdButton);
 
-        // Listeners que muestran el overlay
         newChild.addEventListener('click', mostrarOverlayHD);
         hdButton.addEventListener('click', addFav);
     }
 })();
-// Función para guardar la lista actual
+
 function guardarLista() {
     GM_setValue('listaHD', JSON.stringify(listaHD));
 }
-function addFav(){
 
+function addFav() {
+    const nombre = document.getElementById("main-title").textContent;
+    const existe = listaHD.some(peli => peli.nombre === nombre);
 
-    var nombre = document.getElementById("main-title").textContent
+    if(existe) return
     const imagen = document.querySelector('img[itemprop="image"]');
     const url = imagen.src;
-    var hd = "1"
+    const hd = document.getElementsByClassName('film-right-box vod-wrapper')[0];
+    const hdValue = hd ? 1 : 0;
+    const urlPelicula = window.location.href;
+
+
     listaHD.unshift({
-        id:"1",
+        id: Date.now().toString(),
         urlImg: url,
         nombre: nombre,
-        estado: hd})
+        estado: hdValue,
+        urlPeli:urlPelicula
+    });
+    console.log(urlPelicula)
     guardarLista();
 }
-// ✅ Función que crea y muestra el overlay
+
 function mostrarOverlayHD() {
-    // Crear overlay
     const overlay = document.createElement('div');
     overlay.style.cssText = `
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.8);
-    z-index: 10000;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-`;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        z-index: 10000;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    `;
 
-    // Generar lista dinámica
-    function generarListaHD() {
-        return listaHD.map(item => `
-        <li style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #eee;">
-<img src="${item.urlImg}" width="70" height="104" />
-            <span style="flex: 1;">${item.nombre}</span>
-            <button
-                onclick="cambiarEstado(${item.id})"
-                style="
-                    background: ${item.estado === '0' ? '#447CAD' : item.estado === '1' ? '#F9C700' : '#28a745'};
-                    border: none;
-                    color: white;
-                    border-radius: 50%;
-                    width: 35px;
-                    height: 35px;
-                    cursor: pointer;
-                    font-size: 14px;
-                "
-            >
-                ${item.estado === '0' ? '⏳' : item.estado === '1' ? '🔄' : '✅'}
-            </button>
-        </li>
-    `).join('');
+    function borrarPeli(id) {
+        listaHD = listaHD.filter(peli => peli.id !== id);
+        guardarLista();
+        actualizarLista();
     }
 
-    // Overlay HTML
+    function generarListaHD() {
+        return listaHD.map(item => `
+<li style="display: flex; align-items: center; padding: 12px 0; border-bottom: 1px solid #eee; gap: 10px;">
+    <!-- ZONA CLICABLE -->
+    <a href="${item.urlPeli}" style="display: flex; align-items: center; gap: 10px; text-decoration: none; flex: 1;">
+        <div style="width: 70px; height: 104px; overflow: hidden; border-radius: 8px;">
+            <img src="${item.urlImg}" width="70" height="104" style="object-fit: cover;" />
+        </div>
+        <span style="font-size: 18px; line-height: 1.4; color: ${color1};">
+            ${item.nombre}
+        </span>
+    </a>
+
+
+                <div style="display: flex; gap: 8px; align-items: center;">
+${item.estado === 1 ? `
+    <button data-id="${item.id}"
+        style="
+            background: ${item.estado === 1 ? color1 : "#FFF"};
+            border: none;
+            color: white;
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            cursor: pointer;
+            font-size: 14px;
+        ">
+        <span class="btn-estado blink" style="color: ${color2}">HD</span>
+    </button>
+` : `
+    <span></span>
+`}
+
+
+                    <button class="btn-borrar" data-id="${item.id}"
+                        style="
+                            background: ${color1};
+                            border: none;
+                            color: white;
+                            border-radius: 50%;
+                            width: 35px;
+                            height: 35px;
+                            cursor: pointer;
+                            font-size: 22px;
+                            font-weight: bold;
+                        ">
+                        ×
+                    </button>
+                </div>
+            </li>
+        `).join('');
+    }
+
     overlay.innerHTML = `
-    <div style="background: #fff; border-radius: 10px; max-width: 500px; width: 90%; max-height: 80vh; overflow-y: auto; position: relative;">
-        <div style="background: #447CAD; padding: 20px; color: white; font-size: 22px; font-weight: bold; text-align: center;">
-            LISTA <span style="color: #F9C700;">HD</span> DE ESPERA
-            <div style="font-size: 14px; margin-top: 5px;">${listaHD.length} películas</div>
-        </div>
+        <div style="background: #fff; border-radius: 10px; max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto; position: relative;">
+            <div style="background: ${color1}; padding: 20px; color: white; font-size: 22px; font-weight: bold; text-align: center; position: relative;">
+                LISTA <span style="color: ${color2};">HD</span> DE ESPERA
+                <div id="contador" style="font-size: 14px; margin-top: 5px;">${listaHD.length} películas</div>
+                <button id="closeOverlayBtn" style="position: absolute; top: 15px; right: 15px; background: rgba(255,255,255,0.2); border: none; color: white; font-size: 20px; cursor: pointer; border-radius: 50%; width: 30px; height: 30px;">✖</button>
+            </div>
 
-        <button id="closeOverlayBtn" style="position: absolute; top: 15px; right: 15px; background: rgba(255,255,255,0.2); border: none; color: white; font-size: 20px; cursor: pointer; border-radius: 50%; width: 30px; height: 30px;">✖</button>
-
-        <div style="padding: 20px;">
-            <ul id="lista-hd" style="list-style: none; padding: 0; margin: 0;">
-                ${generarListaHD()}
-            </ul>
+            <div id="listaContainer" style="padding: 20px;">
+                ${listaHD.length === 0 ?
+        '<div style="text-align: center; padding: 40px; color: #666;">No hay películas en la lista HD</div>' :
+    '<ul id="lista-hd" style="list-style: none; padding: 0; margin: 0;">' + generarListaHD() + '</ul>'
+}
+            </div>
         </div>
-    </div>
-`;
+    `;
 
     document.body.appendChild(overlay);
 
-    // Función global para cambiar estado
-    window.cambiarEstado = function(id) {
-        const item = listaHD.find(peli => peli.id === id);
-        if (item) {
-            const estados = ['pendiente', 'procesando', 'completado'];
-            const currentIndex = estados.indexOf(item.estado);
-            item.estado = estados[(currentIndex + 1) % estados.length];
-            actualizarLista();
-        }
-    };
-
     function actualizarLista() {
-        const listaElement = overlay.querySelector('#lista-hd');
-        listaElement.innerHTML = generarListaHD();
+        const container = overlay.querySelector('#listaContainer');
+        const contador = overlay.querySelector('#contador');
+        if (listaHD.length === 0) {
+            container.innerHTML = '<div style="text-align: center; padding: 40px; color: #666;">No hay películas en la lista HD</div>';
+        } else {
+            container.innerHTML = '<ul id="lista-hd" style="list-style: none; padding: 0; margin: 0;">' + generarListaHD() + '</ul>';
+        }
+        contador.textContent = `${listaHD.length} películas`;
     }
 
-    // Cerrar overlay
+    // ✅ Delegación de eventos
+    overlay.addEventListener('click', (e) => {
+        if (e.target.matches('.btn-borrar')) {
+            borrarPeli(e.target.dataset.id);
+        }
+    });
+
     overlay.querySelector('#closeOverlayBtn').addEventListener('click', () => overlay.remove());
     overlay.addEventListener('click', (e) => {
         if (e.target === overlay) overlay.remove();
     });
+    document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        overlay.remove();
+    }
+});
 }
