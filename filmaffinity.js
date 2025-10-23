@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Lista HD en FilmAffinity
 // @namespace    http://tampermonkey.net/
-// @version      1.2.1
+// @version      1.2.2
 // @description  Crea un overlay estilo FilmAffinity para la lista HD
 // @author       Marc
 // @match        https://www.filmaffinity.com/*
@@ -58,6 +58,7 @@ const id = urlPelicula.split("/").pop().split(".")[0];
         targetDiv.appendChild(newChild);
 
         const hdButton = document.createElement('button');
+        hdButton.classList.add('hd_button');
 
         hdButton.style.cssText = `
             background: ${listaHD.some(p => p.id === id) ? color2 : color1};
@@ -75,6 +76,7 @@ const id = urlPelicula.split("/").pop().split(".")[0];
         `;
         // Crear un span interno para el texto "HD" y añadir la clase blink
         const hdSpan = document.createElement('span');
+        hdSpan.id = 'hdSpan';
         hdSpan.textContent = 'HD';
         if(listaHD.some(p => p.id === id & p.estado === 1)){
 
@@ -120,6 +122,11 @@ function borrarPeli(peliId) {
     listaHD = listaHD.filter(peli => peli.id !== peliId);
     guardarLista();
     actualizarOverlay();
+
+    const botonHD = document.getElementsByClassName("hd_button")[0];
+    botonHD.style.background = color1;
+    const spanHD = document.getElementById("hdSpan");
+    spanHD.classList.remove('blink');
 
 }
 
