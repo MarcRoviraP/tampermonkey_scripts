@@ -38,6 +38,12 @@ const id = urlPelicula.split("/").pop().split(".")[0];
             mostrarOverlayHD();
         }
     });
+    document.addEventListener("keydown", function (e) {
+        if (e.altKey && e.key.toLowerCase() === "e") {
+            e.preventDefault();
+            mostrarOverlayHD2("https://www.filmaffinity.com/es/film811435.html","https://pics.filmaffinity.com/superman-138926671-mmed.jpg","Superman");
+        }
+    });
 
     const delDiv = document.querySelector('.add-movie-list-info.add-to-list-button');
     if (delDiv) delDiv.remove();
@@ -52,6 +58,7 @@ const id = urlPelicula.split("/").pop().split(".")[0];
         targetDiv.appendChild(newChild);
 
         const hdButton = document.createElement('button');
+
         hdButton.style.cssText = `
             background: ${listaHD.some(p => p.id === id) ? color2 : color1};
             color: white;
@@ -113,6 +120,7 @@ function borrarPeli(peliId) {
     listaHD = listaHD.filter(peli => peli.id !== peliId);
     guardarLista();
     actualizarOverlay();
+
 }
 
 function toggleFavFilm(button, textSpan) {
@@ -202,4 +210,56 @@ function actualizarOverlay() {
     container.innerHTML = listaHD.length === 0
         ? '<div style="text-align:center;padding:40px;color:#666;">No hay películas en la lista HD</div>'
     : `<ul style="list-style:none;padding:0;margin:0;">${generarListaHD()}</ul>`;
+}
+let overlayGlobal2; // para poder actualizarlo desde otras funciones
+
+function mostrarOverlayHD2(urlPagina,urlImg,title) {
+    if (overlayGlobal2) overlayGlobal2.remove(); // eliminar si ya existe
+
+    const overlay = document.createElement('div');
+    overlay.style.cssText = `
+        position: fixed;
+        top:0; left:0;
+        width:100%; height:100%;
+        background: rgba(0,0,0,0.8);
+        z-index: 10000;
+        display:flex;
+        justify-content:center;
+        align-items:center;
+    `;
+    overlayGlobal2 = overlay;
+
+    overlay.innerHTML = `
+    <div style="background:#fff;border-radius:10px;width:15%;height:auto;overflow-y:auto;position:relative;">
+        <div style="background:${color1};padding:20px;color:white;font-size:20px;font-weight:bold;text-align:center;position:relative;">
+            NUEVA PELÍCULA EN  <span style="color:${color2};">HD</span>
+        </div>
+
+        <div style="padding:20px;text-align:center;">
+            <img src="${urlImg}"
+     style="width:150px;height:auto;display:block;border-radius:10px;margin:0 auto;box-shadow:0 4px 8px rgba(0,0,0,0.2);"
+     alt="Película en HD"/>
+
+            <h1 style="color:#333;margin:20px 0;font-size:28px;text-align:center;">${title}</h1>
+
+            <a href="${urlPagina}" style="text-decoration:none;">
+    <button style="background:${color1}; color:white; border:none; padding:12px 30px; font-size:16px; font-weight:bold; border-radius:10px; cursor:pointer; transition:all 0.3s ease; margin:10px auto; display:block;">
+        LISTA <span style="color:${color2}">HD</span> DE ESPERA
+    </button>
+</a>
+        </div>
+    </div>
+`;
+    document.body.appendChild(overlay);
+
+    // Delegación de eventos
+    overlay.addEventListener('click', (e) => {
+        if (e.target.matches('.btn-borrar')) {
+            borrarPeli(e.target.dataset.id);
+        }
+        if (e.target === overlay) overlay.remove();
+    });
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') overlay.remove();
+    });
 }
