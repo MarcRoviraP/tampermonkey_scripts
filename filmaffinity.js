@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Lista HD en FilmAffinity
 // @namespace    http://tampermonkey.net/
-// @version      1.2
+// @version      1.2.1
 // @description  Crea un overlay estilo FilmAffinity para la lista HD
 // @author       Marc
 // @match        https://www.filmaffinity.com/*
