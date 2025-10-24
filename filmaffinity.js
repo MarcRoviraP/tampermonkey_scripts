@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Lista HD en FilmAffinity
 // @namespace    http://tampermonkey.net/
-// @version      1.2.2
+// @version      1.2.3
 // @description  Crea un overlay estilo FilmAffinity para la lista HD
 // @author       Marc
 // @match        https://www.filmaffinity.com/*
@@ -141,6 +141,7 @@ function toggleFavFilm(button, textSpan) {
         const peli = listaHD.find(p => p.id === id);
         if (peli && peli.estado === 1) {
             textSpan.classList.add('blink');
+            mostrarOverlayHD2(peli.urlPeli,peli.urlImg,peli.nombre);
         }
     }
 
@@ -242,6 +243,7 @@ function mostrarOverlayHD2(urlPagina,urlImg,title) {
             NUEVA PELÍCULA EN  <span style="color:${color2};">HD</span>
         </div>
 
+            <a href="${urlPagina}" style="text-decoration:none;">
         <div style="padding:20px;text-align:center;">
             <img src="${urlImg}"
      style="width:150px;height:auto;display:block;border-radius:10px;margin:0 auto;box-shadow:0 4px 8px rgba(0,0,0,0.2);"
@@ -249,15 +251,18 @@ function mostrarOverlayHD2(urlPagina,urlImg,title) {
 
             <h1 style="color:#333;margin:20px 0;font-size:28px;text-align:center;">${title}</h1>
 
-            <a href="${urlPagina}" style="text-decoration:none;">
-    <button style="background:${color1}; color:white; border:none; padding:12px 30px; font-size:16px; font-weight:bold; border-radius:10px; cursor:pointer; transition:all 0.3s ease; margin:10px auto; display:block;">
+</a>
+    <button id="btnOv2" style="background:${color1}; color:white; border:none; padding:12px 30px; font-size:16px; font-weight:bold; border-radius:10px; cursor:pointer; transition:all 0.3s ease; margin:10px auto; display:block;">
         LISTA <span style="color:${color2}">HD</span> DE ESPERA
     </button>
-</a>
         </div>
     </div>
 `;
     document.body.appendChild(overlay);
+const btn = document.getElementById("btnOv2");
+btn.addEventListener("click", mostrarOverlayHD);
+
+
 
     // Delegación de eventos
     overlay.addEventListener('click', (e) => {
