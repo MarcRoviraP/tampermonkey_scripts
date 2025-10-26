@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Lista HD en FilmAffinity
 // @namespace    http://https://github.com/MarcRoviraP/mis-scripts-filmaffinity
-// @version      1.4
+// @version      1.4.1
 // @description  Crea un overlay estilo FilmAffinity para la lista HD
 // @author       Marc
 // @match        http*://*/*
@@ -120,46 +120,57 @@ const timestamp = Date.now();
             if (verEn) {
                 let nombre = document.getElementById("main-title").textContent.trim();
                 nombre = nombre.replace(/\s+/g, "+");
+                const bodyDiv = verEn.querySelector('.body');
 
                 const url = "http://pelisflix20.date/?s=" + nombre;
 
                 const btnPelisflix = document.createElement("button");
-                btnPelisflix.style.display = "flex";
-                btnPelisflix.style.alignItems = "center";
-                btnPelisflix.style.padding = "10px 15px";
-                btnPelisflix.style.border = "none";
-                btnPelisflix.style.borderRadius = "6px";
-                btnPelisflix.style.backgroundColor = "#ff2e63";
-                btnPelisflix.style.color = "white";
-                btnPelisflix.style.cursor = "pointer";
-                btnPelisflix.style.fontWeight = "bold";
-                btnPelisflix.style.marginTop = "10px";
-                btnPelisflix.style.transition = "background-color 0.3s ease, transform 0.2s ease";
+                btnPelisflix.style.cssText = `
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 8px 12px;
+    margin-top: 12px;
+    border: 0px solid #dcdcdc;
+    border-radius: 6px;
+    background: linear-gradient(to bottom, #f5f5f5, #eaeaea);
+    color: #333;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+`;
+
 
                 // Crear el icono
                 const imgIcon = document.createElement("img");
                 imgIcon.src = "https://s.pelisflix20.date/flix/imgs/cropped-1F17F-p-button-128-32x32.png";
                 imgIcon.alt = "Icono PelisFlix";
-                imgIcon.style.height = "20px";
-                imgIcon.style.marginRight = "8px";
+                imgIcon.style.height = "18px";
+                imgIcon.style.marginRight = "6px";
+
+
 
                 btnPelisflix.appendChild(imgIcon);
                 btnPelisflix.appendChild(document.createTextNode("Buscar en PelisFlix"));
 
                 // Hover y click
                 btnPelisflix.addEventListener("mouseover", () => {
-                    btnPelisflix.style.backgroundColor = "#e12556";
-                    btnPelisflix.style.transform = "scale(1.05)";
+                    btnPelisflix.style.background = "linear-gradient(to bottom, #e9e9e9, #dcdcdc)";
+                    btnPelisflix.style.transform = "translateY(-2px)";
                 });
                 btnPelisflix.addEventListener("mouseout", () => {
-                    btnPelisflix.style.backgroundColor = "#ff2e63";
-                    btnPelisflix.style.transform = "scale(1)";
+                    btnPelisflix.style.background = "linear-gradient(to bottom, #f5f5f5, #eaeaea)";
+                    btnPelisflix.style.transform = "translateY(0)";
                 });
+
                 btnPelisflix.addEventListener("click", () => {
                     window.open(url, "_blank");
                 });
 
-                verEn.appendChild(btnPelisflix);
+                bodyDiv.appendChild(btnPelisflix);
             }
 
         }
