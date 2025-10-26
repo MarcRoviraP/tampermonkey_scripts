@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Lista HD en FilmAffinity
 // @namespace    http://https://github.com/MarcRoviraP/mis-scripts-filmaffinity
-// @version      1.3.1
+// @version      1.4
 // @description  Crea un overlay estilo FilmAffinity para la lista HD
 // @author       Marc
 // @match        http*://*/*
@@ -114,8 +114,59 @@ const timestamp = Date.now();
 
             newChild.addEventListener('click', mostrarOverlayHD);
             hdButton.addEventListener('click', () => toggleFavFilm(hdButton,hdSpan));
+            //PELISFLIX
+            const verEn = document.getElementsByClassName("film-right-box vod-wrapper")[0];
+
+            if (verEn) {
+                let nombre = document.getElementById("main-title").textContent.trim();
+                nombre = nombre.replace(/\s+/g, "+");
+
+                const url = "http://pelisflix20.date/?s=" + nombre;
+
+                const btnPelisflix = document.createElement("button");
+                btnPelisflix.style.display = "flex";
+                btnPelisflix.style.alignItems = "center";
+                btnPelisflix.style.padding = "10px 15px";
+                btnPelisflix.style.border = "none";
+                btnPelisflix.style.borderRadius = "6px";
+                btnPelisflix.style.backgroundColor = "#ff2e63";
+                btnPelisflix.style.color = "white";
+                btnPelisflix.style.cursor = "pointer";
+                btnPelisflix.style.fontWeight = "bold";
+                btnPelisflix.style.marginTop = "10px";
+                btnPelisflix.style.transition = "background-color 0.3s ease, transform 0.2s ease";
+
+                // Crear el icono
+                const imgIcon = document.createElement("img");
+                imgIcon.src = "https://s.pelisflix20.date/flix/imgs/cropped-1F17F-p-button-128-32x32.png";
+                imgIcon.alt = "Icono PelisFlix";
+                imgIcon.style.height = "20px";
+                imgIcon.style.marginRight = "8px";
+
+                btnPelisflix.appendChild(imgIcon);
+                btnPelisflix.appendChild(document.createTextNode("Buscar en PelisFlix"));
+
+                // Hover y click
+                btnPelisflix.addEventListener("mouseover", () => {
+                    btnPelisflix.style.backgroundColor = "#e12556";
+                    btnPelisflix.style.transform = "scale(1.05)";
+                });
+                btnPelisflix.addEventListener("mouseout", () => {
+                    btnPelisflix.style.backgroundColor = "#ff2e63";
+                    btnPelisflix.style.transform = "scale(1)";
+                });
+                btnPelisflix.addEventListener("click", () => {
+                    window.open(url, "_blank");
+                });
+
+                verEn.appendChild(btnPelisflix);
+            }
+
         }
+
     }
+
+
 
 })();
 
