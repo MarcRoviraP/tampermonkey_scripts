@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Lista HD en FilmAffinity
 // @namespace    http://https://github.com/MarcRoviraP/mis-scripts-filmaffinity
-// @version      1.3
+// @version      1.3.1
 // @description  Crea un overlay estilo FilmAffinity para la lista HD
 // @author       Marc
 // @match        http*://*/*
@@ -11,6 +11,7 @@
 // @grant GM_addValueChangeListener
 // @connect      filmaffinity.com
 
+
 // ==/UserScript==
 
 let listaHD = JSON.parse(GM_getValue('listaHD', '[]'));
@@ -18,6 +19,7 @@ const color1 = "#447CAD";
 const color2 = "#F9C700";
 const urlPelicula = window.location.href;
 const id = urlPelicula.split("/").pop().split(".")[0];
+const timestamp = Date.now();
 
 (function () {
     'use strict';
@@ -35,22 +37,18 @@ const id = urlPelicula.split("/").pop().split(".")[0];
     `;
     document.head.appendChild(style);
     // Scraping
-    const timestamp = Date.now();
 
     let time = GM_getValue("time", null);
     if (time === null) {
-        GM_setValue("time", timestamp);
         time = timestamp;
     }
 
     // Comprobar que han pasado 24h
-    //    const ONE_DAY = 24 * 60 * 60 * 1000;
-    const ONE_DAY = 3600 * 1000;
+    const ONE_DAY = 24 * 60 * 60 * 1000;
+    //const ONE_DAY = 10 * 1000;
     if (timestamp - time >= ONE_DAY) {
         console.log("Han pasado 24 horas. Hago algo aquí...");
         comprobarDisponibilidadHD();
-        // Actualizamos el valor para que vuelva a contar desde ahora
-        GM_setValue("time", timestamp);
     } else {
         console.log("Aún no han pasado 24 horas.");
     }
@@ -167,6 +165,9 @@ async function comprobarDisponibilidadHD() {
     } else {
         console.log("No hay cambios en la lista HD");
     }
+
+    // Actualizamos el valor para que vuelva a contar desde ahora
+    GM_setValue("time", timestamp);
 }
 
 function comprobarPeliculaHD(url) {
@@ -184,7 +185,7 @@ function comprobarPeliculaHD(url) {
                 const parser = new DOMParser();
                 const doc = parser.parseFromString(response.responseText, "text/html");
 
-const tieneHD = doc.querySelector('.film-right-box.vod-wrapper') !== null;
+                const tieneHD = doc.querySelector('.film-right-box.vod-wrapper') !== null;
                 console.log(`Resultado HD: ${tieneHD}`);
                 resolve(tieneHD);
             },
@@ -255,7 +256,7 @@ function toggleFavFilm(button, textSpan) {
 
 // -------------------- OVERLAY --------------------
 
-let overlayGlobal; // para poder actualizarlo desde otras funciones
+let overlayGlobal;
 
 // -------------------- OVERLAY 1 --------------------
 function mostrarOverlayHD() {
