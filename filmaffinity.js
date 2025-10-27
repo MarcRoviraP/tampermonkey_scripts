@@ -1,10 +1,10 @@
 // ==UserScript==
 // @name         Lista HD en FilmAffinity
 // @namespace    http://https://github.com/MarcRoviraP/mis-scripts-filmaffinity
-// @version      1.4.1
+// @version      1.4.2
 // @description  Crea un overlay estilo FilmAffinity para la lista HD
 // @author       Marc
-// @match        http*://*/*
+// @match        https://www.filmaffinity.com/*
 // @grant        GM_setValue
 // @grant        GM_getValue
 // @grant        GM_xmlhttpRequest
@@ -114,7 +114,17 @@ const timestamp = Date.now();
 
             newChild.addEventListener('click', mostrarOverlayHD);
             hdButton.addEventListener('click', () => toggleFavFilm(hdButton,hdSpan));
-            //PELISFLIX
+           createPelisflix();
+        }
+
+    }
+
+
+
+})();
+
+function createPelisflix(){
+     //PELISFLIX
             const verEn = document.getElementsByClassName("film-right-box vod-wrapper")[0];
 
             if (verEn) {
@@ -173,14 +183,7 @@ const timestamp = Date.now();
                 bodyDiv.appendChild(btnPelisflix);
             }
 
-        }
-
-    }
-
-
-
-})();
-
+}
 // -------------------- FUNCIONES GLOBALES --------------------
 async function comprobarDisponibilidadHD() {
     console.log("Películas a comprobar: " + listaHD.length);
