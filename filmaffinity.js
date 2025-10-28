@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Lista HD en FilmAffinity
 // @namespace    http://https://github.com/MarcRoviraP/mis-scripts-filmaffinity
-// @version      1.4.2
+// @version      1.4.3
 // @description  Crea un overlay estilo FilmAffinity para la lista HD
 // @author       Marc
 // @match        https://www.filmaffinity.com/*
@@ -64,18 +64,15 @@ const timestamp = Date.now();
                 mostrarOverlayHD();
             }
         });
-        document.addEventListener("keydown", function (e) {
-            if (e.altKey && e.key.toLowerCase() === "e") {
-                e.preventDefault();
-                mostrarOverlayHD2("https://www.filmaffinity.com/es/film811435.html","https://pics.filmaffinity.com/superman-138926671-mmed.jpg","Superman");
-            }
-        });
 
         const delDiv = document.querySelector('.add-movie-list-info.add-to-list-button');
         if (delDiv) delDiv.remove();
         // Preparar botón HD en la página
         const targetDiv = document.querySelector('.add-text-content');
         if (targetDiv) {
+            targetDiv.style.backgroundColor = "#FFF";
+            targetDiv.style.padding = "5px";
+            targetDiv.style.margin = "5px 5px 5px";
             const newChild = document.createElement('a');
             newChild.textContent = ' Lista HD en espera';
             newChild.style.color = color1;
@@ -114,7 +111,7 @@ const timestamp = Date.now();
 
             newChild.addEventListener('click', mostrarOverlayHD);
             hdButton.addEventListener('click', () => toggleFavFilm(hdButton,hdSpan));
-           createPelisflix();
+          // createPelisflix();
         }
 
     }
